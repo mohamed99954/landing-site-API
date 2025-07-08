@@ -1,0 +1,12 @@
+# Ignore dependencies
+node_modules/
+
+# Ignore environment files
+.env
+
+# Ignore uploaded files
+uploads/
+
+# Optional:
+.DS_Store
+*.log
