@@ -1,10 +1,32 @@
 const Service = require('../models/service.model');
+const cloudinary = require('../utils/cloudinary');
+const streamifier = require('streamifier'); // نحتاج هذا لتحويل الـ buffer إلى stream
+
+// وظيفة لرفع صورة واحدة باستخدام stream
+const uploadToCloudinary = (fileBuffer) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'services' },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    streamifier.createReadStream(fileBuffer).pipe(stream);
+  });
+};
 
 // إنشاء خدمة
 exports.createService = async (req, res) => {
   try {
     const { title, shortDescription, description } = req.body;
-    const images = req.files?.map(file => file.filename) || [];
+    let images = [];
+
+    if (req.files && req.files.length > 0) {
+      images = await Promise.all(
+        req.files.map(file => uploadToCloudinary(file.buffer))
+      );
+    }
 
     const newService = await Service.create({
       title,
@@ -15,7 +37,7 @@ exports.createService = async (req, res) => {
 
     res.status(201).json(newService);
   } catch (err) {
-    console.error("❌ Error in createService:", err); // ⬅ أضف هذا
+    console.error("❌ Error in createService:", err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -47,7 +69,13 @@ exports.getServiceById = async (req, res) => {
 exports.updateService = async (req, res) => {
   try {
     const { title, shortDescription, description } = req.body;
-    const images = req.files?.map(file => file.filename) || [];
+    let images = [];
+
+    if (req.files && req.files.length > 0) {
+      images = await Promise.all(
+        req.files.map(file => uploadToCloudinary(file.buffer))
+      );
+    }
 
     const updated = await Service.findByIdAndUpdate(
       req.params.id,
