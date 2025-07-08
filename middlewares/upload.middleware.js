@@ -1,18 +1,10 @@
+// middlewares/upload.middleware.js
 const multer = require('multer');
-const path = require('path');
 
-// إعداد التخزين
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
-  },
-});
+// استخدام التخزين في الذاكرة
+const storage = multer.memoryStorage();
 
-// فلترة أنواع الملفات (صور فقط)
+// فلترة الصور فقط
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
