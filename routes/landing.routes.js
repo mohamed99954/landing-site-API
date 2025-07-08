@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
+
+// استخدم الميدل وير الجاهز اللي فيه memoryStorage
+const upload = require('../middlewares/upload.middleware');
 const controller = require('../controllers/landing.controller');
 
-// إعداد Multer لحقول محددة
-const upload = multer({ dest: 'uploads/' });
-
 router.get('/', controller.getLanding);
+
 router.put(
   '/',
   upload.fields([
