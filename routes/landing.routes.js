@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-// استخدم الميدل وير الجاهز اللي فيه memoryStorage
 const upload = require('../middlewares/upload.middleware');
 const controller = require('../controllers/landing.controller');
 
@@ -12,6 +11,13 @@ router.put(
   upload.fields([
     { name: 'logoImage', maxCount: 1 },
     { name: 'backgroundImage', maxCount: 1 },
+    { name: 'hero1', maxCount: 1 },
+    { name: 'hero2', maxCount: 1 },
+    { name: 'hero3', maxCount: 1 },
+    { name: 'hero4', maxCount: 1 },
+    { name: 'hero5', maxCount: 1 },
+    { name: 'about1', maxCount: 1 },
+    { name: 'about2', maxCount: 1 },
   ]),
   controller.updateLanding
 );

@@ -9,6 +9,12 @@ exports.updateLanding = async (req, res) => {
       aboutText,
       terms,
       privacyPolicy,
+      facebook,
+      instagram,
+      twitter,
+      linkedin,
+      youtube,
+      tiktok
     } = req.body;
 
     const updateFields = {
@@ -17,46 +23,55 @@ exports.updateLanding = async (req, res) => {
       aboutText,
       terms,
       privacyPolicy,
+      socialLinks: {
+        facebook,
+        instagram,
+        twitter,
+        linkedin,
+        youtube,
+        tiktok
+      }
     };
 
-    // رفع logoImage إلى Cloudinary
-    if (req.files?.logoImage?.[0]) {
-      const logoBuffer = req.files.logoImage[0].buffer;
-      const logoResult = await new Promise((resolve, reject) => {
+    // 🔽 Helper function لرفع صورة إلى cloudinary
+    const uploadToCloudinary = (fileBuffer, folder) => {
+      return new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
-          { folder: 'landing/logo' },
+          { folder },
           (err, result) => {
             if (err) return reject(err);
-            resolve(result);
+            resolve(result.secure_url);
           }
-        ).end(logoBuffer);
+        ).end(fileBuffer);
       });
+    };
 
-      updateFields.logoImage = logoResult.secure_url;
+    // 🔹 الصور المفردة المطلوبة
+    const fileFields = [
+      { key: 'logoImage', folder: 'landing/logo' },
+      { key: 'backgroundImage', folder: 'landing/background' },
+      { key: 'hero1', folder: 'landing/hero' },
+      { key: 'hero2', folder: 'landing/hero' },
+      { key: 'hero3', folder: 'landing/hero' },
+      { key: 'hero4', folder: 'landing/hero' },
+      { key: 'hero5', folder: 'landing/hero' },
+      { key: 'about1', folder: 'landing/about' },
+      { key: 'about2', folder: 'landing/about' },
+    ];
+
+    for (const { key, folder } of fileFields) {
+      if (req.files?.[key]?.[0]) {
+        const buffer = req.files[key][0].buffer;
+        const url = await uploadToCloudinary(buffer, folder);
+        updateFields[key] = url;
+      }
     }
 
-    // رفع backgroundImage إلى Cloudinary
-    if (req.files?.backgroundImage?.[0]) {
-      const bgBuffer = req.files.backgroundImage[0].buffer;
-      const bgResult = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: 'landing/background' },
-          (err, result) => {
-            if (err) return reject(err);
-            resolve(result);
-          }
-        ).end(bgBuffer);
-      });
-
-      updateFields.backgroundImage = bgResult.secure_url;
-    }
-
-    // تحديث أو إنشاء البيانات
-    const updated = await Landing.findOneAndUpdate(
-      {},
-      updateFields,
-      { new: true, upsert: true }
-    );
+    // 🔄 تحديث أو إدخال جديد
+    const updated = await Landing.findOneAndUpdate({}, updateFields, {
+      new: true,
+      upsert: true,
+    });
 
     res.json(updated);
   } catch (err) {
