@@ -1,21 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
+const adminController = require('../controllers/admin.controller');
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '123456';
+// ✅ تسجيل دخول الأدمن
+router.post('/login', adminController.loginAdmin);
 
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
-    });
-    res.json({ token });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
-  }
-});
+// ✅ إنشاء أدمن جديد (يمكن حذفه بعد الإنشاء الأولي)
+router.post('/create', adminController.createAdmin);
 
 module.exports = router;
