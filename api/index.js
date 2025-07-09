@@ -20,9 +20,11 @@ const createDefaultAdmin = async () => {
     if (!exists) {
       await Admin.create({ email, password });
       console.log('✅ تم إنشاء الأدمن المؤقت (Vercel)');
+    } else {
+      console.log('ℹ الأدمن المؤقت موجود مسبقًا');
     }
   } catch (err) {
-    console.error('❌ خطأ أثناء إنشاء الأدمن:', err);
+    console.error('❌ خطأ أثناء إنشاء الأدمن:', err.message);
   }
 };
 
@@ -30,10 +32,13 @@ module.exports = async (req, res) => {
   if (!isConnected) {
     try {
       await connectDB();
-      await createDefaultAdmin();
+      console.log('✅ الاتصال بقاعدة البيانات تم بنجاح');
       isConnected = true;
+
+      // فقط بعد الاتصال نقوم بإنشاء الأدمن
+      await createDefaultAdmin();
     } catch (err) {
-      console.error('❌ فشل الاتصال بقاعدة البيانات:', err);
+      console.error('❌ فشل الاتصال بقاعدة البيانات:', err.message);
       return res.status(500).json({ error: 'Database connection failed' });
     }
   }
