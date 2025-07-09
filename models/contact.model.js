@@ -1,11 +1,13 @@
-const express = require('express');
-const router = express.Router();
-const controller = require('../controllers/contact.controller');
+// models/contact.model.js
 
-// POST: إرسال رسالة تواصل
-router.post('/', controller.sendContact);
+const mongoose = require('mongoose');
 
-// GET: جلب جميع الرسائل (اختياري - لوحة الإدارة)
-router.get('/', controller.getAllContacts);
+const contactSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  message: { type: String, required: true }
+}, {
+  timestamps: true
+});
 
-module.exports = router;
+module.exports = mongoose.model('Contact', contactSchema);
