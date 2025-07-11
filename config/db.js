@@ -4,13 +4,10 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // طباعة الرابط المستخدم للاتصال (لأغراض التصحيح فقط)
+    // طباعة الرابط المستخدم للاتصال (اختياري لأغراض التصحيح)
     console.log('🔍 MongoDB URI:', process.env.MONGO_URI);
 
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGO_URI);
 
     console.log('✅ MongoDB Connected Successfully');
   } catch (err) {
