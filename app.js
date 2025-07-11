@@ -1,4 +1,4 @@
-// app.js (مع خطأ متعمد)
+// app.js (بعد التصحيح والفحص)
 
 const express = require('express');
 const cors = require('cors');
@@ -8,10 +8,10 @@ const path = require('path');
 
 dotenv.config();
 
-// استيراد الراوتات (افتراض أن أحدها غير موجود أو undefined)
+// استيراد الراوتات
 const serviceRoutes = require('./routes/service.routes');
 const articleRoutes = require('./routes/article.routes');
-const projectRoutes = undefined; // ⛔ خطأ متعمد هنا
+const projectRoutes = require('./routes/project.routes'); // ✅ تم تصحيح الخطأ هنا
 const landingRoutes = require('./routes/landing.routes');
 const contactRoutes = require('./routes/contact.routes');
 const adminRoutes = require('./routes/admin.routes');
@@ -29,6 +29,23 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// 🧠 فحص الراوترات قبل استخدامها (كشف أي undefined)
+const routers = {
+  adminRoutes,
+  contactRoutes,
+  landingRoutes,
+  serviceRoutes,
+  articleRoutes,
+  projectRoutes,
+  featureRoutes,
+};
+
+for (const [name, route] of Object.entries(routers)) {
+  if (typeof route !== 'function') {
+    console.warn(`⚠  Warning: ${name} is not a valid router (check require path or export)`);
+  }
+}
+
 // ✅ الراوتات العامة
 app.use('/api/admin', adminRoutes);
 app.use('/api/contact', contactRoutes);
@@ -37,10 +54,7 @@ app.use('/api/landing', landingRoutes);
 // ✅ الراوتات المحمية بالتوكن
 app.use('/api/services', verifyToken, serviceRoutes);
 app.use('/api/articles', verifyToken, articleRoutes);
-
-// ⛔ هذا السطر سيتسبب في الخطأ
 app.use('/api/projects', verifyToken, projectRoutes);
-
 app.use('/api/features', verifyToken, featureRoutes);
 
 // ✅ مسار فحص
