@@ -6,12 +6,15 @@ exports.createContact = async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
+    // تحقق من اكتمال الحقول
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'الاسم، البريد، والرسالة مطلوبة' });
     }
 
+    // 1. حفظ الرسالة في قاعدة البيانات
     const savedMessage = await Contact.create({ name, email, message });
 
+    // 2. إعداد النقل عبر Gmail باستخدام بيانات البيئة
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -20,6 +23,7 @@ exports.createContact = async (req, res) => {
       }
     });
 
+    // 3. إعداد تفاصيل البريد
     const mailOptions = {
       from: email,
       to: process.env.EMAIL_RECEIVER,
@@ -32,6 +36,7 @@ exports.createContact = async (req, res) => {
       `
     };
 
+    // 4. إرسال البريد
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
@@ -52,5 +57,16 @@ exports.getAllContacts = async (req, res) => {
   } catch (err) {
     console.error('❌ فشل في جلب الرسائل:', err.message);
     res.status(500).json({ error: '❌ فشل في جلب الرسائل' });
+  }
+};
+
+// ✅ حذف رسالة تواصل واحدة
+exports.deleteContact = async (req, res) => {
+  try {
+    await Contact.findByIdAndDelete(req.params.id);
+    res.json({ message: 'تم حذف الرسالة بنجاح' });
+  } catch (err) {
+    console.error('❌ فشل في حذف الرسالة:', err.message);
+    res.status(500).json({ error: '❌ حدث خطأ أثناء حذف الرسالة' });
   }
 };
