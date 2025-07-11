@@ -1,23 +1,27 @@
-// middlewares/auth.middleware.js
-
 const jwt = require('jsonwebtoken');
 
+// ✅ Middleware لحماية المسارات باستخدام JWT
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // تحقق من وجود التوكن
+  // 🔹 التحقق من وجود التوكن بصيغة Bearer
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: '❌ التوكن غير موجود أو غير صالح' });
+    return res.status(401).json({ error: '❌ Access denied. No token provided.' });
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
+    // 🔹 فك التوكن
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.admin = decoded; // حفظ بيانات الأدمن المستخرجة من التوكن
+
+    // 🔹 حفظ بيانات المستخدم (مثلاً: ID أو email)
+    req.admin = decoded;
+
     next();
   } catch (err) {
-    return res.status(401).json({ error: '❌ التوكن غير صالح أو منتهي' });
+    console.error('❌ JWT verification failed:', err.message);
+    return res.status(401).json({ error: '❌ Invalid or expired token.' });
   }
 };
 

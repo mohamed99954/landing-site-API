@@ -1,32 +1,41 @@
-const express = require('express');
-const router = express.Router();
+const Feature = require('../models/feature.model');
 
-// تأكد من أن المسار صحيح 100%
-const controller = require('../controllers/contact.controller');
-
-// تحقق أن sendContact و getAllContacts موجودتان فعلاً
-if (typeof controller.sendContact !== 'function') {
-  console.error('❌ sendContact is not a function or is undefined');
-}
-
-if (typeof controller.getAllContacts !== 'function') {
-  console.error('❌ getAllContacts is not a function or is undefined');
-}
-
-// إرسال رسالة تواصل
-router.post('/', (req, res, next) => {
-  if (typeof controller.sendContact === 'function') {
-    return controller.sendContact(req, res, next);
+// ✅ Get all features
+exports.getAllFeatures = async (req, res) => {
+  try {
+    const features = await Feature.find();
+    res.json(features);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  res.status(500).send('sendContact function is not available.');
-});
+};
 
-// عرض كل الرسائل
-router.get('/', (req, res, next) => {
-  if (typeof controller.getAllContacts === 'function') {
-    return controller.getAllContacts(req, res, next);
+// ✅ Create a new feature
+exports.createFeature = async (req, res) => {
+  try {
+    const feature = await Feature.create(req.body);
+    res.status(201).json(feature);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
-  res.status(500).send('getAllContacts function is not available.');
-});
+};
 
-module.exports = router;
+// ✅ Update an existing feature
+exports.updateFeature = async (req, res) => {
+  try {
+    const updated = await Feature.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+// ✅ Delete a feature
+exports.deleteFeature = async (req, res) => {
+  try {
+    await Feature.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Feature deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

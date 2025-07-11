@@ -4,8 +4,18 @@ const router = express.Router();
 const upload = require('../middlewares/upload.middleware');
 const controller = require('../controllers/landing.controller');
 
+/**
+ * @route   GET /api/landing
+ * @desc    Get landing page content
+ * @access  Public
+ */
 router.get('/', controller.getLanding);
 
+/**
+ * @route   PUT /api/landing
+ * @desc    Update landing page content and images
+ * @access  Admin
+ */
 router.put(
   '/',
   upload.fields([

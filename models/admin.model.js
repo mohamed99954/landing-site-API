@@ -1,31 +1,31 @@
-// models/admin.model.js
-
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // ✅ تغيير هنا
+const bcrypt = require('bcryptjs');
 
 const adminSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true,
+    required: [true, 'البريد الإلكتروني مطلوب'],
     unique: true,
-    lowercase: true
+    lowercase: true,
+    trim: true
   },
   password: {
     type: String,
-    required: true
+    required: [true, 'كلمة المرور مطلوبة'],
+    minlength: 6
   }
-});
+}, { timestamps: true });
 
-// تشفير كلمة المرور قبل الحفظ
+// 🔒 تشفير كلمة المرور قبل الحفظ
 adminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12); // ✅ لا حاجة لتغيير الدالة
+  this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// دالة للمقارنة بين كلمة المرور المدخلة والمشفرة
+// ✅ مقارنة كلمة المرور الأصلية بالمشفرة
 adminSchema.methods.comparePassword = async function (plainPassword) {
-  return bcrypt.compare(plainPassword, this.password); // ✅ نفس الطريقة
+  return bcrypt.compare(plainPassword, this.password);
 };
 
 module.exports = mongoose.model('Admin', adminSchema);

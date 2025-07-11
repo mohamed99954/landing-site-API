@@ -6,21 +6,19 @@ const landingSchema = new mongoose.Schema({
   aboutText: { type: String },
   terms: { type: String },
   privacyPolicy: { type: String },
+
+  // ✅ الصور
   logoImage: { type: String },
   backgroundImage: { type: String },
-
-  // ✅ صور الـ Hero Section
   hero1: { type: String },
   hero2: { type: String },
   hero3: { type: String },
   hero4: { type: String },
   hero5: { type: String },
-
-  // ✅ صور قسم About
   about1: { type: String },
   about2: { type: String },
 
-  // ✅ روابط التواصل الاجتماعي
+  // ✅ روابط التواصل
   socialLinks: {
     facebook: { type: String },
     twitter: { type: String },
@@ -29,6 +27,28 @@ const landingSchema = new mongoose.Schema({
     youtube: { type: String },
     tiktok: { type: String }
   },
+
+  // ✅ معلومات التواصل
+  contactInfo: {
+    phone: { type: String },
+    email: { type: String },
+    address: { type: String }
+  },
+
+  // ✅ عناوين الأقسام
+  sectionTitles: {
+    servicesTitle: { type: String },
+    projectsTitle: { type: String },
+    blogTitle: { type: String }
+  },
+
+  // ✅ دعوة لاتخاذ إجراء (Call to Action)
+  mainCTA: {
+    title: { type: String },
+    buttonText: { type: String },
+    link: { type: String }
+  }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model('Landing', landingSchema);

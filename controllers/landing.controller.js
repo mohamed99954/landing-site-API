@@ -14,7 +14,16 @@ exports.updateLanding = async (req, res) => {
       twitter,
       linkedin,
       youtube,
-      tiktok
+      tiktok,
+      phone,
+      email,
+      address,
+      servicesTitle,
+      projectsTitle,
+      blogTitle,
+      mainCTATitle,
+      mainCTAButton,
+      mainCTALink
     } = req.body;
 
     const updateFields = {
@@ -30,10 +39,25 @@ exports.updateLanding = async (req, res) => {
         linkedin,
         youtube,
         tiktok
+      },
+      contactInfo: {
+        phone,
+        email,
+        address
+      },
+      sectionTitles: {
+        servicesTitle,
+        projectsTitle,
+        blogTitle
+      },
+      mainCTA: {
+        title: mainCTATitle,
+        buttonText: mainCTAButton,
+        link: mainCTALink
       }
     };
 
-    // 🔽 Helper function لرفع صورة إلى cloudinary
+    // 🔽 Helper لرفع الصور إلى cloudinary
     const uploadToCloudinary = (fileBuffer, folder) => {
       return new Promise((resolve, reject) => {
         cloudinary.uploader.upload_stream(
@@ -46,7 +70,7 @@ exports.updateLanding = async (req, res) => {
       });
     };
 
-    // 🔹 الصور المفردة المطلوبة
+    // 🔹 الملفات المتوقعة من الفورم
     const fileFields = [
       { key: 'logoImage', folder: 'landing/logo' },
       { key: 'backgroundImage', folder: 'landing/background' },
@@ -67,7 +91,6 @@ exports.updateLanding = async (req, res) => {
       }
     }
 
-    // 🔄 تحديث أو إدخال جديد
     const updated = await Landing.findOneAndUpdate({}, updateFields, {
       new: true,
       upsert: true,
