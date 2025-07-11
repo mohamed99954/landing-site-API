@@ -3,7 +3,8 @@ const Feature = require('../models/feature.model');
 // ✅ إنشاء ميزة جديدة
 exports.createFeature = async (req, res) => {
   try {
-    const { title, subtitle, icon } = req.body;
+    const { title, subtitle } = req.body;
+    const icon = req.file ? req.file.filename : null;
 
     if (!title || !icon) {
       return res.status(400).json({ error: 'العنوان والأيقونة مطلوبة' });
@@ -28,12 +29,12 @@ exports.getAllFeatures = async (req, res) => {
   }
 };
 
-// ✅ جلب ميزة واحدة بالمعرّف
+// ✅ جلب ميزة واحدة بالمعرف
 exports.getFeatureById = async (req, res) => {
   try {
     const feature = await Feature.findById(req.params.id);
     if (!feature) {
-      return res.status(404).json({ error: '❌ لم يتم العثور على الميزة' });
+      return res.status(404).json({ error: 'الميزة غير موجودة' });
     }
     res.json(feature);
   } catch (err) {
@@ -45,16 +46,20 @@ exports.getFeatureById = async (req, res) => {
 // ✅ تحديث ميزة
 exports.updateFeature = async (req, res) => {
   try {
-    const { title, subtitle, icon } = req.body;
+    const { title, subtitle } = req.body;
+    const icon = req.file ? req.file.filename : undefined;
+
+    const updateData = { title, subtitle };
+    if (icon) updateData.icon = icon;
 
     const updated = await Feature.findByIdAndUpdate(
       req.params.id,
-      { title, subtitle, icon },
+      updateData,
       { new: true }
     );
 
     if (!updated) {
-      return res.status(404).json({ error: '❌ الميزة غير موجودة' });
+      return res.status(404).json({ error: 'الميزة غير موجودة' });
     }
 
     res.json(updated);
@@ -69,7 +74,7 @@ exports.deleteFeature = async (req, res) => {
   try {
     const deleted = await Feature.findByIdAndDelete(req.params.id);
     if (!deleted) {
-      return res.status(404).json({ error: '❌ الميزة غير موجودة' });
+      return res.status(404).json({ error: 'الميزة غير موجودة' });
     }
     res.json({ message: '✅ تم حذف الميزة بنجاح' });
   } catch (err) {
